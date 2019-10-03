@@ -2,14 +2,15 @@ const db = require('../db');
 const _ = require('lodash');
 
 const executeQuery = (query, values) => {
-  return db.queryAscynd(query,values).spread(results => results);
+  return db.queryAsync(query, values).spread(results => results);
 };
+
 const parseData = options => {
   return _.reduce(options, (parsed, value, key) => {
-  parsed.string.push(`${key} =?`);
-  parsed.values.push(value);
-  return parsed;
-  }, {string: [], values: []});
+    parsed.string.push(`${key} = ?`);
+    parsed.values.push(value);
+    return parsed;
+  }, { string: [], values: [] });
 };
 
 class Model{
@@ -22,11 +23,16 @@ class Model{
     return executeQuery(queryString, parsedOptions.values).then(result => results[0]);
   }
   create(options){
-    let queryString =  `INSERT INTO ${this.tablename}`;
-    return executeQuery(queryString,options);
+    let queryString =  `INSERT INTO ${this.tablename} SET ?`;
+    return executeQuery(queryString,options)
+    .then(() => {return options})
+    .error((err) => {throw err;});
   }
-  getAll(options) {
-    let queryString = `SELECT name FROM ${this.table}`
+  getAll() {
+    let queryString = `SELECT name FROM ${this.tablename}`
+    return executeQuery(queryString)
   }
 
 }
+
+module.exports = Model;

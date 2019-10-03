@@ -1,0 +1,1 @@
+module.exports.Cow = require('./cows');
