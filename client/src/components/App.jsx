@@ -9,7 +9,7 @@ class App extends Component{
     }
   }
   componentDidMount(){
-    axios.get('http://127.0.0.1:8080/cows')
+    axios.get('/cows')
       .then(
         res => {
           console.log('worked')
